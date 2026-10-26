@@ -1,0 +1,36 @@
+{
+  "tools": [
+    {
+      "id": "Cinejoy",
+      "name": "CineJoy",
+      "url": "https://cinejoy.pk",
+      "category": "Entertainment",
+      "icon_url": "https://www.google.com/s2/favicons?domain=cinejoy.pk&sz=128",
+      "description": "Stream Thousands of Movies & TV Shows for Free, Online",
+      "No_login": true,
+      "accent_color": "#5aa121"
+    },
+    {
+      "id": "wormhole_01",
+      "name": "Wormhole",
+      "url": "https://wormhole.app/",
+      "category": "Tools",
+      "banner_image": "https://images.unsplash.com/photo-1610296669228-602fa827fc1f?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
+      "show_icon_overlay": true,
+      "description": "free, end-to-end encrypted file-sharing service that lets you send up to 10 GB of files without creating an account.",
+      "No_login": true,
+      "accent_color": "#f2027f"
+    },
+    {
+      "id": "reanime_01",
+      "name": "Re:ANIME",
+      "url": "https://reanime.to",
+      "category": "Tools",
+      "banner_image": "https://images.unsplash.com/photo-1610296669228-602fa827fc1f?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
+      "show_icon_overlay": true,
+      "description": "Watch free anime online in HD. Stream the latest seasonal hits, classic series, and everything in between — with no ads, no clutter, just anime.",
+      "No_login": true,
+      "accent_color": "#f2027f"
+    }
+  ]
+}

@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Discover</title>
+  <link rel="icon" type="svg" href="compass.svg">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            glass: {
+              bg: 'rgba(15, 23, 42, 0.75)',
+              card: 'rgba(30, 41, 59, 0.45)',
+              border: 'rgba(255, 255, 255, 0.1)',
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0', transform: 'scale(0.98)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(18px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.5); }
+
+    .glass-nav {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .glass-card {
+      background: rgba(30, 41, 59, 0.45);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:hover {
+      background: rgba(45, 58, 80, 0.65);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -12px rgba(168, 85, 247, 0.25);
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+
+    .glass-input {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-input:focus {
+      border-color: rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.25);
+    }
+
+    .hero-transition {
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-[#070a12] text-slate-100 min-h-screen selection:bg-purple-500/30 selection:text-purple-200 relative overflow-x-hidden font-sans">
+
+  <!-- Ambient Backdrop -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-32 left-1/4 w-[600px] h-[600px] bg-purple-600/15 rounded-full blur-[140px]"></div>
+    <div class="absolute top-1/2 -right-32 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[150px]"></div>
+  </div>
+
+  <!-- Header Navigation Bar -->
+  <header class="fixed top-0 inset-x-0 z-40 px-4 sm:px-8 py-3.5 flex items-center justify-between pointer-events-none gap-4">
+    <!-- Flat Logo Icon -->
+    <div class="pointer-events-auto flex items-center gap-2.5 shrink-0">
+      <div class="p-2 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30">
+        <i data-lucide="compass" class="w-5 h-5"></i>
+      </div>
+      <span class="text-lg sm:text-xl font-bold tracking-tight text-white drop-shadow-md hidden xs:inline">Web Discover</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="pointer-events-auto glass-nav rounded-full px-3 py-1.5 flex items-center gap-2 sm:gap-3 shadow-2xl max-w-full overflow-x-auto no-scrollbar">
+      <div class="flex items-center gap-1 shrink-0">
+        <button onclick="setTab('home')" id="nav-home" class="px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-900 bg-white shadow-md transition-all flex items-center gap-1.5">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Home</span>
+        </button>
+        <button onclick="setTab('discover')" id="nav-discover" class="px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+          <i data-lucide="flame" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Discover</span>
+        </button>
+        <button onclick="setTab('all')" id="nav-all" class="px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+          <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">All Sites</span>
+        </button>
+        <button onclick="setTab('build')" id="nav-build" class="px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Add</span>
+        </button>
+      </div>
+
+      <div class="h-4 w-px bg-white/10 shrink-0"></div>
+
+      <!-- Live Search Bar -->
+      <div class="relative w-28 sm:w-40 md:w-52 shrink-0">
+        <input type="text" id="navSearchInput" oninput="handleNavSearch(event)" placeholder="Search directory..." class="w-full pl-8 pr-3 py-1.5 rounded-full glass-input text-xs text-white placeholder-slate-400 focus:outline-none">
+        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
+      </div>
+
+      <button onclick="openSettingsModal()" class="p-2 rounded-full text-slate-300 hover:text-white transition-all shrink-0" title="Settings">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="pt-20 min-h-screen relative z-10">
+
+    <!-- TAB 1: HOME VIEW -->
+    <section id="view-home" class="space-y-10 pb-16 animate-fade-in">
+      
+      <!-- Auto Rotating Hero Banner -->
+      <div id="heroContainer" class="relative w-full h-[55vh] min-h-[420px] max-h-[580px] overflow-hidden flex items-center">
+        <div id="heroBg" class="absolute inset-0 bg-cover bg-center hero-transition filter brightness-75"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#070a12] via-[#070a12]/10 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#070a12] via-[#070a12]/20 to-transparent"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 md:px-12 w-full grid grid-cols-1 md:grid-cols-2 items-center gap-8">
+          <div id="heroTextContent" class="space-y-4 max-w-xl hero-transition">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-bold uppercase tracking-wider">Featured Showcase</span>
+              <div id="heroCategories" class="flex flex-wrap gap-1"></div>
+            </div>
+
+            <h1 id="heroTitle" class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">Web Discover</h1>
+            <p id="heroDesc" class="text-xs sm:text-sm text-slate-300 line-clamp-3 leading-relaxed"></p>
+
+            <div class="flex items-center gap-3 pt-2">
+              <a id="heroVisitBtn" href="#" target="_blank" class="px-5 sm:px-6 py-2.5 rounded-full bg-white text-slate-900 font-bold text-xs hover:bg-slate-200 transition-all shadow-xl flex items-center gap-2 active:scale-95">
+                <i data-lucide="play" class="w-4 h-4 fill-slate-900"></i>
+                <span>Visit Site</span>
+              </a>
+              <button id="heroSaveBtn" class="p-2.5 rounded-full glass-nav text-white hover:bg-white/10 transition-all active:scale-95" title="Save">
+                <i data-lucide="star" class="w-4 h-4"></i>
+              </button>
+              <button id="heroInfoBtn" class="p-2.5 rounded-full glass-nav text-white hover:bg-white/10 transition-all active:scale-95" title="Info">
+                <i data-lucide="info" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero Icon Overlay Badge -->
+          <div class="hidden md:flex justify-end">
+            <div id="heroRightBadge" class="w-36 h-36 lg:w-44 lg:h-44 rounded-3xl glass-nav p-5 flex items-center justify-center border border-white/10 shadow-2xl hero-transition">
+              <img id="heroRightIcon" src="" class="w-20 h-20 lg:w-24 lg:h-24 object-contain rounded-2xl" alt="">
+            </div>
+          </div>
+        </div>
+
+        <div id="heroDots" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"></div>
+      </div>
+
+      <!-- Home Rows -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 space-y-10">
+        <!-- Saved Row -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+              <span>Your Saved Websites</span>
+            </h3>
+            <button onclick="setTab('all')" class="text-xs text-purple-400 hover:underline font-medium">View All Saved (<span id="savedRowCount">0</span>)</button>
+          </div>
+
+          <div id="savedRow" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- Directory Showcase -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="compass" class="w-4 h-4 text-purple-400"></i>
+              <span>Directory Highlights</span>
+            </h3>
+            <button onclick="setTab('all')" class="text-xs text-purple-400 hover:underline font-medium">Explore All Directory (<span id="directoryTotalCount">0</span>)</button>
+          </div>
+
+          <div id="directoryRow" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: DISCOVER VIEW -->
+    <section id="view-discover" class="hidden max-w-md mx-auto px-4 py-10 flex flex-col items-center justify-center min-h-[75vh] animate-fade-in">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-white flex items-center justify-center gap-2">
+          <i data-lucide="flame" class="w-6 h-6 text-amber-500"></i>
+          <span>Discover Portal</span>
+        </h2>
+        <p class="text-xs text-slate-400">Evaluate websites one by one</p>
+      </div>
+
+      <div class="relative w-full h-[380px] flex items-center justify-center">
+        <div id="swipeCard" class="glass-card rounded-3xl p-6 w-full h-full flex flex-col justify-between border border-white/10 shadow-2xl relative transition-all duration-300">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-12 h-12 rounded-2xl glass-panel p-2 flex items-center justify-center border border-white/10">
+                <img id="swipeIcon" src="" class="w-full h-full object-contain rounded-lg" alt="">
+              </div>
+              <div id="swipeCats" class="flex flex-wrap gap-1 justify-end"></div>
+            </div>
+
+            <h3 id="swipeTitle" class="text-xl font-bold text-white mb-2"></h3>
+            <p id="swipeDesc" class="text-xs text-slate-300 leading-relaxed line-clamp-5"></p>
+          </div>
+
+          <div class="pt-4 border-t border-white/5 flex items-center justify-between">
+            <span id="swipeAuth" class="text-[10px] text-emerald-400 font-medium"></span>
+            <span id="swipeCount" class="text-[10px] text-slate-500 font-mono">1 / 100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6 mt-8">
+        <button onclick="handleSwipeAction('ignore')" class="w-12 h-12 rounded-full glass-nav text-rose-400 hover:bg-rose-500/20 border-rose-500/30 flex items-center justify-center shadow-xl active:scale-90 transition-all" title="Ignore">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <button onclick="handleSwipeAction('visit')" class="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-lg shadow-purple-600/30 active:scale-90 transition-all" title="Visit">
+          <i data-lucide="external-link" class="w-6 h-6"></i>
+        </button>
+        <button onclick="handleSwipeAction('save')" class="w-12 h-12 rounded-full glass-nav text-amber-400 hover:bg-amber-500/20 border-amber-500/30 flex items-center justify-center shadow-xl active:scale-90 transition-all" title="Save">
+          <i data-lucide="star" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 3: ALL SITES VIEW -->
+    <section id="view-all" class="hidden max-w-7xl mx-auto px-4 sm:px-8 md:px-12 py-8 animate-fade-in space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">All Sites Catalog</h2>
+          <p class="text-xs text-slate-400">Complete catalog across categories</p>
+        </div>
+
+        <div class="relative w-full sm:w-64">
+          <select id="categorySelect" onchange="handleCategoryFilterChange()" class="w-full px-4 py-2.5 rounded-xl glass-input text-xs text-slate-200 focus:outline-none cursor-pointer appearance-none">
+            <option value="All">All Categories</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+          </div>
+        </div>
+      </div>
+
+      <div id="allGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
+    </section>
+
+    <!-- TAB 4: ADD VIEW -->
+    <section id="view-build" class="hidden max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-10 animate-fade-in">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl">
+        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-purple-400"></i>
+          <span>Add Custom Website</span>
+        </h3>
+
+        <form id="addSiteForm" onsubmit="handleAddSiteSubmit(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Website Name *</label>
+              <input type="text" id="siteNameInput" required placeholder="e.g. My Site" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Target URL *</label>
+              <input type="url" id="siteUrlInput" required placeholder="https://example.com" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white focus:outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Category (Comma-separated)</label>
+              <input type="text" id="siteCatInput" placeholder="Art & Design, Tools" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Accent Color</label>
+              <input type="color" id="siteColorInput" value="#a855f7" class="w-full h-9 p-1 rounded-xl glass-input cursor-pointer">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Icon URL (Optional)</label>
+              <input type="url" id="siteIconInput" placeholder="Auto favicon" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Description</label>
+            <textarea id="siteDescInput" rows="2" placeholder="Overview..." class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white focus:outline-none resize-none"></textarea>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="siteNoLoginInput" class="rounded bg-slate-900 border-white/20 text-purple-600 focus:ring-purple-500">
+            <label for="siteNoLoginInput" class="text-xs text-slate-300 cursor-pointer">No Login Required</label>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-lg shadow-purple-600/30 transition-all">Save Site</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl space-y-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="file-json" class="w-5 h-5 text-indigo-400"></i>
+              <span>Interactive JSON List Builder</span>
+            </h3>
+            <p class="text-xs text-slate-400">Select items to generate clean JSON objects without outer `[` `]` brackets.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="selectAllBuilderSites()" class="px-3 py-1.5 rounded-lg glass-nav text-xs text-slate-300 hover:text-white">Select All</button>
+            <button onclick="clearBuilderSelection()" class="px-3 py-1.5 rounded-lg glass-nav text-xs text-slate-400 hover:text-white">Clear</button>
+          </div>
+        </div>
+
+        <div id="builderGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto no-scrollbar p-1"></div>
+
+        <div class="space-y-2 pt-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-300">Clean JSON Output (<span id="selectedBuilderCount">0</span> selected)</span>
+            <button onclick="generateCleanJsonList()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md">Generate Clean JSON</button>
+          </div>
+          <textarea id="cleanJsonOutput" readonly rows="5" class="w-full p-4 rounded-xl glass-input font-mono text-xs text-purple-200 focus:outline-none resize-none" placeholder="Click generate..."></textarea>
+          <div class="flex justify-end">
+            <button onclick="copyCleanJson()" class="px-4 py-2 rounded-xl glass-nav text-xs font-medium text-slate-200 hover:text-white">Copy Clean Items</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 border border-white/10 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="settings" class="w-5 h-5 text-purple-400"></i>
+          <span>Settings</span>
+        </h3>
+        <button onclick="closeSettingsModal()" class="p-1 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="space-y-4">
+        <button onclick="exportBackupData()" class="w-full px-4 py-2.5 rounded-xl glass-nav text-xs text-slate-200 hover:text-white flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4 text-slate-400"></i>
+          <span>Export Local Backup</span>
+        </button>
+
+        <button onclick="resetAllData()" class="w-full px-4 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 hover:bg-rose-500/20 text-xs font-medium flex items-center justify-center gap-2">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Reset Saved Custom Data</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Modal -->
+  <div id="infoModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 border border-white/10 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center gap-3 min-w-0">
+          <div id="infoModalIconBox" class="w-10 h-10 rounded-xl glass-panel p-1.5 flex items-center justify-center shrink-0"></div>
+          <div class="min-w-0">
+            <h3 id="infoModalTitle" class="text-base font-bold text-white truncate"></h3>
+            <div id="infoModalCats" class="flex flex-wrap gap-1 mt-0.5"></div>
+          </div>
+        </div>
+        <button onclick="closeInfoModal()" class="p-1 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      
+      <p id="infoModalDesc" class="text-xs text-slate-300 leading-relaxed"></p>
+
+      <div class="glass-panel p-3 rounded-2xl border border-white/10 space-y-1">
+        <span class="text-[10px] text-slate-400 uppercase font-semibold block">Target URL</span>
+        <div class="flex items-center justify-between gap-2">
+          <a id="infoModalUrl" href="#" target="_blank" class="text-xs text-purple-300 hover:underline break-all truncate font-mono"></a>
+          <button onclick="copyModalUrl()" class="p-1.5 rounded-lg glass-nav text-slate-300 hover:text-white shrink-0" title="Copy Link">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass-panel p-2.5 rounded-xl border border-white/5">
+          <span class="text-[10px] text-slate-400 uppercase block">Authentication</span>
+          <span id="infoModalNoLogin" class="text-xs font-semibold text-emerald-400"></span>
+        </div>
+        <div class="glass-panel p-2.5 rounded-xl border border-white/5">
+          <span class="text-[10px] text-slate-400 uppercase block">Accent Color</span>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span id="infoModalColorDot" class="w-3 h-3 rounded-full"></span>
+            <span id="infoModalColorHex" class="text-xs font-mono text-slate-300"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <a id="infoModalVisitBtn" href="#" target="_blank" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg"><span>Visit Site</span><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Execution & Data Sync Logic -->
+  <script>
+    const REMOTE_DIRECTORY_URL = 'https://getpage.github.io/Site-dat-list/list.json';
+
+    let state = {
+      directorySites: [],
+      featuredSites: [],
+      categoriesList: [],
+      savedSites: JSON.parse(localStorage.getItem('stella_saved_sites')) || [],
+      activeTab: 'home',
+      selectedCategory: 'All',
+      searchQuery: '',
+      heroIndex: 0,
+      heroTimer: null,
+      swipeIndex: 0,
+      selectedBuilderIds: new Set()
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      loadAllDirectories();
+      startHeroTimer();
+    });
+
+    function extractItemsArray(data) {
+      if (!data) return [];
+      if (Array.isArray(data)) return data;
+      if (data.tools && Array.isArray(data.tools)) return data.tools;
+      if (data.featured && Array.isArray(data.featured)) return data.featured;
+      if (data.sites && Array.isArray(data.sites)) return data.sites;
+      return [];
+    }
+
+    async function loadAllDirectories() {
+      try {
+        const [remoteRes, localListRes, localCatRes, localFeatRes] = await Promise.allSettled([
+          fetch(REMOTE_DIRECTORY_URL, { cache: 'no-cache' }),
+          fetch('list.json', { cache: 'no-cache' }),
+          fetch('categories.json', { cache: 'no-cache' }),
+          fetch('featured.json', { cache: 'no-cache' })
+        ]);
+
+        let itemsMap = new Map();
+
+        if (remoteRes.status === 'fulfilled' && remoteRes.value.ok) {
+          const remoteData = await remoteRes.value.json();
+          extractItemsArray(remoteData).forEach(item => { if (item && item.id) itemsMap.set(item.id, item); });
+          if (remoteData.categories && Array.isArray(remoteData.categories)) {
+            state.categoriesList = remoteData.categories;
+          }
+        }
+
+        if (localListRes.status === 'fulfilled' && localListRes.value.ok) {
+          const localData = await localListRes.value.json();
+          extractItemsArray(localData).forEach(item => { if (item && item.id) itemsMap.set(item.id, item); });
+        }
+
+        state.directorySites = Array.from(itemsMap.values());
+
+        if (localCatRes.status === 'fulfilled' && localCatRes.value.ok) {
+          const catData = await localCatRes.value.json();
+          const cats = Array.isArray(catData) ? catData : (catData.categories || []);
+          state.categoriesList = [...new Set([...state.categoriesList, ...cats])];
+        }
+
+        if (localFeatRes.status === 'fulfilled' && localFeatRes.value.ok) {
+          const featData = await localFeatRes.value.json();
+          state.featuredSites = extractItemsArray(featData);
+        }
+      } catch (err) {
+        console.warn('Network or local fetch note:', err);
+      } finally {
+        if (state.directorySites.length === 0) {
+          state.directorySites = [
+            {
+              id: "thiings_01",
+              name: "Thiings",
+              url: "https://thiings.co",
+              category: "Art & Design",
+              icon_url: "https://www.google.com/s2/favicons?domain=thiings.co&sz=128",
+              description: "Browse and find high-quality images and visual assets.",
+              No_login: true,
+              accent_color: "#f4a261"
+            }
+          ];
+        }
+
+        if (state.featuredSites.length === 0) {
+          state.featuredSites = state.directorySites.slice(0, 5);
+        }
+
+        renderApp();
+      }
+    }
+
+    function parseCategories(catString) {
+      if (!catString) return ['General'];
+      return catString.split(',').map(c => c.trim()).filter(Boolean);
+    }
+
+    function renderApp() {
+      renderHeroBanner();
+      renderHomeRows();
+      renderAllGrid();
+      populateCategories();
+      renderSwipeCard();
+      renderBuilderGrid();
+      lucide.createIcons();
+    }
+
+    function setTab(tab) {
+      state.activeTab = tab;
+      ['home', 'discover', 'all', 'build'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if (t === tab) {
+          view.classList.remove('hidden');
+          nav.className = 'px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-900 bg-white shadow-md transition-all flex items-center gap-1.5';
+        } else {
+          view.classList.add('hidden');
+          nav.className = 'px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5';
+        }
+      });
+    }
+
+    function renderHeroBanner() {
+      const pool = state.featuredSites.length ? state.featuredSites : state.directorySites;
+      if (!pool || pool.length === 0) return;
+
+      const site = pool[state.heroIndex % pool.length];
+      const heroText = document.getElementById('heroTextContent');
+      const heroRight = document.getElementById('heroRightBadge');
+      const heroBg = document.getElementById('heroBg');
+
+      heroText.style.opacity = '0';
+      heroText.style.transform = 'translateY(8px)';
+      heroRight.style.opacity = '0';
+
+      setTimeout(() => {
+        document.getElementById('heroTitle').textContent = site.name;
+        document.getElementById('heroDesc').textContent = site.description || 'Web Discover Portal';
+
+        const catsBox = document.getElementById('heroCategories');
+        catsBox.innerHTML = '';
+        parseCategories(site.category).forEach(cat => {
+          const span = document.createElement('span');
+          span.className = 'px-2 py-0.5 rounded-md glass-panel text-slate-300 text-[10px] font-medium border border-white/10';
+          span.textContent = cat;
+          catsBox.appendChild(span);
+        });
+
+        document.getElementById('heroVisitBtn').onclick = () => window.open(site.url, '_blank');
+        document.getElementById('heroSaveBtn').onclick = (e) => toggleSaveSite(e, site.id);
+        document.getElementById('heroInfoBtn').onclick = (e) => openInfoModal(e, site.id);
+
+        const faviconSrc = site.icon_url || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(site.url)}&sz=128`;
+        document.getElementById('heroRightIcon').src = faviconSrc;
+
+        if (site.banner_image) {
+          heroBg.style.backgroundImage = `url('${site.banner_image}')`;
+          if (site.show_icon_overlay) {
+            heroRight.classList.remove('hidden');
+          } else {
+            heroRight.classList.add('hidden');
+          }
+        } else {
+          heroBg.style.backgroundImage = 'none';
+          heroRight.classList.remove('hidden');
+        }
+
+        heroText.style.opacity = '1';
+        heroText.style.transform = 'translateY(0)';
+        heroRight.style.opacity = '1';
+      }, 150);
+
+      const dots = document.getElementById('heroDots');
+      dots.innerHTML = '';
+      pool.slice(0, 8).forEach((_, idx) => {
+        const dot = document.createElement('button');
+        dot.className = `h-1.5 rounded-full transition-all duration-300 ${idx === (state.heroIndex % pool.length) ? 'w-6 bg-purple-400' : 'w-1.5 bg-white/30 hover:bg-white/60'}`;
+        dot.onclick = () => { state.heroIndex = idx; renderHeroBanner(); resetHeroTimer(); };
+        dots.appendChild(dot);
+      });
+    }
+
+    function startHeroTimer() {
+      state.heroTimer = setInterval(() => {
+        state.heroIndex++;
+        renderHeroBanner();
+      }, 6000);
+    }
+
+    function resetHeroTimer() {
+      clearInterval(state.heroTimer);
+      startHeroTimer();
+    }
+
+    function renderHomeRows() {
+      const savedRow = document.getElementById('savedRow');
+      document.getElementById('savedRowCount').textContent = state.savedSites.length;
+      savedRow.innerHTML = '';
+
+      if (state.savedSites.length === 0) {
+        savedRow.innerHTML = `<p class="text-xs text-slate-400 py-2 col-span-full">No saved sites yet. Star your favorite tools!</p>`;
+      } else {
+        state.savedSites.forEach(site => savedRow.appendChild(createCardElement(site)));
+      }
+
+      const directoryRow = document.getElementById('directoryRow');
+      document.getElementById('directoryTotalCount').textContent = state.directorySites.length;
+      directoryRow.innerHTML = '';
+      state.directorySites.slice(0, 8).forEach(site => directoryRow.appendChild(createCardElement(site)));
+    }
+
+    function createCardElement(site) {
+      const isSaved = state.savedSites.some(s => s.id === site.id);
+      const faviconSrc = site.icon_url || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(site.url)}&sz=128`;
+      const categories = parseCategories(site.category);
+
+      const div = document.createElement('div');
+      div.className = 'glass-card rounded-2xl p-4 w-full flex flex-col justify-between group cursor-pointer border border-white/10 h-full';
+      div.onclick = () => window.open(site.url, '_blank');
+
+      const categoryPillsHtml = categories.map(cat => 
+        `<span class="px-2 py-0.5 rounded-md glass-panel text-slate-300 text-[10px] font-medium border border-white/10">${cat}</span>`
+      ).join('');
+
+      div.innerHTML = `
+        <div>
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl glass-panel p-1.5 flex items-center justify-center shrink-0 border border-white/10 bg-slate-900/50">
+                <img src="${faviconSrc}" class="w-full h-full object-contain rounded" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-bold text-sm text-slate-300\\'>${(site.name || 'W').charAt(0)}</span>'">
+              </div>
+              <div class="min-w-0">
+                <h4 class="text-sm font-bold text-white group-hover:text-purple-300 transition-colors truncate tracking-wide">${site.name}</h4>
+                <div class="flex flex-wrap gap-1 mt-1">${categoryPillsHtml}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="openInfoModal(event, '${site.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all"><i data-lucide="info" class="w-4 h-4"></i></button>
+              <button onclick="toggleSaveSite(event, '${site.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 transition-all"><i data-lucide="star" class="w-4 h-4 ${isSaved ? 'fill-amber-400 text-amber-400' : ''}"></i></button>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300/90 line-clamp-2 leading-relaxed mb-4">${site.description || 'No description available.'}</p>
+        </div>
+        <div class="flex items-center justify-between pt-3 border-t border-white/5 text-[10px]">
+          ${site.No_login ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">No Login</span>` : `<span class="text-slate-500">Account Needed</span>`}
+          <div class="flex items-center gap-1 text-slate-400 group-hover:text-purple-300"><span>Visit</span><i data-lucide="external-link" class="w-3.5 h-3.5"></i></div>
+        </div>
+      `;
+      return div;
+    }
+
+    function renderAllGrid() {
+      const grid = document.getElementById('allGrid');
+      grid.innerHTML = '';
+      
+      const pool = [...state.savedSites, ...state.directorySites];
+      const map = new Map();
+      pool.forEach(s => map.set(s.id, s));
+
+      const filtered = Array.from(map.values()).filter(s => {
+        const matchesCat = state.selectedCategory === 'All' || parseCategories(s.category).includes(state.selectedCategory);
+        const matchesSearch = !state.searchQuery || s.name.toLowerCase().includes(state.searchQuery) || (s.description && s.description.toLowerCase().includes(state.searchQuery));
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-slate-400 col-span-full py-8 text-center">No websites match your current search/filter criteria.</p>`;
+      } else {
+        filtered.forEach(site => grid.appendChild(createCardElement(site)));
+      }
+    }
+
+    function handleNavSearch(e) {
+      state.searchQuery = e.target.value.toLowerCase().trim();
+      if (state.searchQuery && state.activeTab !== 'all') {
+        setTab('all');
+      }
+      renderAllGrid();
+    }
+
+    function populateCategories() {
+      const select = document.getElementById('categorySelect');
+      const pool = [...state.savedSites, ...state.directorySites];
+      const map = new Map();
+      pool.forEach(s => map.set(s.id, s));
+
+      const allCatStrings = Array.from(map.values()).map(s => s.category).filter(Boolean);
+      const individualCats = new Set(['All', ...state.categoriesList]);
+      allCatStrings.forEach(catStr => parseCategories(catStr).forEach(c => individualCats.add(c)));
+
+      select.innerHTML = '';
+      Array.from(individualCats).forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        opt.className = 'bg-slate-900';
+        select.appendChild(opt);
+      });
+      select.value = state.selectedCategory;
+    }
+
+    function handleCategoryFilterChange() {
+      state.selectedCategory = document.getElementById('categorySelect').value;
+      renderAllGrid();
+    }
+
+    function renderSwipeCard() {
+      const pool = state.directorySites;
+      if (pool.length === 0) return;
+      const site = pool[state.swipeIndex % pool.length];
+
+      document.getElementById('swipeTitle').textContent = site.name;
+      document.getElementById('swipeDesc').textContent = site.description || 'No overview.';
+      document.getElementById('swipeAuth').textContent = site.No_login ? 'No Login Required' : 'Account Required';
+      document.getElementById('swipeCount').textContent = `${(state.swipeIndex % pool.length) + 1} / ${pool.length}`;
+      document.getElementById('swipeIcon').src = site.icon_url || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(site.url)}&sz=128`;
+
+      const catsBox = document.getElementById('swipeCats');
+      catsBox.innerHTML = '';
+      parseCategories(site.category).forEach(cat => {
+        const span = document.createElement('span');
+        span.className = 'px-2 py-0.5 rounded-md glass-panel text-slate-300 text-[10px] font-medium border border-white/10';
+        span.textContent = cat;
+        catsBox.appendChild(span);
+      });
+    }
+
+    function handleSwipeAction(action) {
+      const pool = state.directorySites;
+      if (pool.length === 0) return;
+      const site = pool[state.swipeIndex % pool.length];
+
+      if (action === 'visit') window.open(site.url, '_blank');
+      if (action === 'save') toggleSaveSite(null, site.id);
+      state.swipeIndex++;
+      renderSwipeCard();
+    }
+
+    function toggleSaveSite(e, id) {
+      if (e) e.stopPropagation();
+      const pool = [...state.savedSites, ...state.directorySites];
+      const map = new Map();
+      pool.forEach(s => map.set(s.id, s));
+
+      const idx = state.savedSites.findIndex(s => s.id === id);
+      if (idx > -1) {
+        state.savedSites.splice(idx, 1);
+      } else {
+        const found = map.get(id);
+        if (found) state.savedSites.push(found);
+      }
+      localStorage.setItem('stella_saved_sites', JSON.stringify(state.savedSites));
+      renderApp();
+    }
+
+    function openInfoModal(e, id) {
+      if (e) e.stopPropagation();
+      const pool = [...state.savedSites, ...state.directorySites];
+      const map = new Map();
+      pool.forEach(s => map.set(s.id, s));
+      const site = map.get(id);
+      if (!site) return;
+
+      document.getElementById('infoModalTitle').textContent = site.name;
+      document.getElementById('infoModalDesc').textContent = site.description || 'No description.';
+      document.getElementById('infoModalNoLogin').textContent = site.No_login ? 'No Login Needed' : 'Account Required';
+      
+      const accent = site.accent_color || '#a855f7';
+      document.getElementById('infoModalColorDot').style.backgroundColor = accent;
+      document.getElementById('infoModalColorHex').textContent = accent;
+
+      const urlLink = document.getElementById('infoModalUrl');
+      urlLink.href = site.url;
+      urlLink.textContent = site.url;
+
+      document.getElementById('infoModalVisitBtn').href = site.url;
+
+      const catsBox = document.getElementById('infoModalCats');
+      catsBox.innerHTML = '';
+      parseCategories(site.category).forEach(cat => {
+        const span = document.createElement('span');
+        span.className = 'px-2 py-0.5 rounded-md glass-panel text-slate-300 text-[10px] font-medium border border-white/10';
+        span.textContent = cat;
+        catsBox.appendChild(span);
+      });
+
+      const faviconSrc = site.icon_url || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(site.url)}&sz=128`;
+      document.getElementById('infoModalIconBox').innerHTML = `<img src="${faviconSrc}" class="w-full h-full object-contain rounded" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-bold text-sm text-slate-300\\'>${site.name.charAt(0)}</span>'">`;
+
+      document.getElementById('infoModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeInfoModal() { document.getElementById('infoModal').classList.add('hidden'); }
+
+    function copyModalUrl() {
+      const url = document.getElementById('infoModalUrl').textContent;
+      if (url) {
+        navigator.clipboard.writeText(url);
+        alert('URL copied to clipboard!');
+      }
+    }
+
+    function renderBuilderGrid() {
+      const grid = document.getElementById('builderGrid');
+      grid.innerHTML = '';
+      const pool = [...state.savedSites, ...state.directorySites];
+      const map = new Map();
+      pool.forEach(s => map.set(s.id, s));
+
+      Array.from(map.values()).forEach(site => {
+        const isSelected = state.selectedBuilderIds.has(site.id);
+        const div = document.createElement('div');
+        div.className = `glass-card rounded-xl p-3 flex items-center justify-between cursor-pointer border ${isSelected ? 'border-purple-500 bg-purple-900/20' : 'border-white/5'}`;
+        div.onclick = () => {
+          if (state.selectedBuilderIds.has(site.id)) state.selectedBuilderIds.delete(site.id);
+          else state.selectedBuilderIds.add(site.id);
+          renderBuilderGrid();
+        };
+
+        div.innerHTML = `
+          <div class="flex items-center gap-2.5 min-w-0">
+            <input type="checkbox" ${isSelected ? 'checked' : ''} class="rounded bg-slate-900 border-white/20 text-purple-600 focus:ring-purple-500 pointer-events-none">
+            <span class="text-xs font-semibold text-white truncate">${site.name}</span>
+          </div>
+          <span class="text-[10px] text-slate-400 truncate max-w-[100px]">${site.category || 'General'}</span>
+        `;
+        grid.appendChild(div);
+      });
+      document.getElementById('selectedBuilderCount').textContent = state.selectedBuilderIds.size;
+    }
+
+    function selectAllBuilderSites() {
+      const pool = [...state.savedSites, ...state.directorySites];
+      const map = new Map();
+      pool.forEach(s => map.set(s.id, s));
+      Array.from(map.values()).forEach(s => state.selectedBuilderIds.add(s.id));
+      renderBuilderGrid();
+    }
+
+    function clearBuilderSelection() {
+      state.selectedBuilderIds.clear();
+      renderBuilderGrid();
+    }
+
+    function generateCleanJsonList() {
+      const pool = [...state.savedSites, ...state.directorySites];
+      const map = new Map();
+      pool.forEach(s => map.set(s.id, s));
+      const selected = Array.from(map.values()).filter(s => state.selectedBuilderIds.has(s.id));
+
+      if (selected.length === 0) {
+        alert('Please select at least one site from the list.');
+        return;
+      }
+
+      const cleanItems = selected.map(s => JSON.stringify({
+        id: s.id,
+        name: s.name,
+        url: s.url,
+        category: s.category || "General",
+        icon_url: s.icon_url || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(s.url)}&sz=128`,
+        description: s.description || "",
+        No_login: !!s.No_login,
+        accent_color: s.accent_color || "#a855f7"
+      }, null, 2)).join(",\n");
+
+      document.getElementById('cleanJsonOutput').value = cleanItems;
+    }
+
+    function copyCleanJson() {
+      const text = document.getElementById('cleanJsonOutput').value;
+      if (!text) return;
+      navigator.clipboard.writeText(text);
+      alert('Clean JSON copied to clipboard!');
+    }
+
+    function handleAddSiteSubmit(e) {
+      e.preventDefault();
+      const newSite = {
+        id: 'custom_' + Date.now(),
+        name: document.getElementById('siteNameInput').value,
+        url: document.getElementById('siteUrlInput').value,
+        category: document.getElementById('siteCatInput').value || 'Custom',
+        accent_color: document.getElementById('siteColorInput').value || '#a855f7',
+        icon_url: document.getElementById('siteIconInput').value || '',
+        description: document.getElementById('siteDescInput').value || '',
+        No_login: document.getElementById('siteNoLoginInput').checked
+      };
+
+      state.savedSites.unshift(newSite);
+      localStorage.setItem('stella_saved_sites', JSON.stringify(state.savedSites));
+      document.getElementById('addSiteForm').reset();
+      renderApp();
+      alert('Custom site saved successfully!');
+    }
+
+    function exportBackupData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.savedSites, null, 2));
+      const a = document.createElement('a');
+      a.href = dataStr;
+      a.download = 'web-discover-backup.json';
+      a.click();
+    }
+
+    function resetAllData() {
+      if (confirm('Clear saved custom sites?')) {
+        localStorage.removeItem('stella_saved_sites');
+        state.savedSites = [];
+        closeSettingsModal();
+        renderApp();
+      }
+    }
+
+    function openSettingsModal() { document.getElementById('settingsModal').classList.remove('hidden'); }
+    function closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
+  </script>
+</body>
+</html>

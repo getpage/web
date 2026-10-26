@@ -1,0 +1,49 @@
+{
+  "featured": [
+    {
+      "id": "thiings_01",
+      "name": "Thiings",
+      "url": "https://thiings.co",
+      "category": "Art & Design",
+      "banner_image": "https://dxukomxvxegiferomewe.supabase.co/storage/v1/object/public/tool-logos/thiings.png?t=1771481003898",
+      "show_icon_overlay": true,
+      "description": "Browse and find high-quality images and visual assets for your creative workflow.",
+      "No_login": true,
+      "accent_color": "#f4a261"
+    },
+    {
+      "id": "Cinejoy",
+      "name": "CineJoy",
+      "url": "https://cinejoy.pk",
+      "category": "Entertainment",
+      "banner_image": "https://images.unsplash.com/photo-1637363990764-de84fd247b7d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
+      "icon_url": "https://www.google.com/s2/favicons?domain=cinejoy.pk&sz=128",
+      "show_icon_overlay": true,
+      "description": "Stream Thousands of Movies & TV Shows for Free, Online",
+      "No_login": true,
+      "accent_color": "#5aa121"
+    },
+    {
+      "id": "wormhole_01",
+      "name": "Wormhole",
+      "url": "https://wormhole.app/",
+      "category": "Tools",
+      "banner_image": "https://images.unsplash.com/photo-1610296669228-602fa827fc1f?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
+      "show_icon_overlay": true,
+      "description": "free, end-to-end encrypted file-sharing service that lets you send up to 10 GB of files without creating an account.",
+      "No_login": true,
+      "accent_color": "#f2027f"
+    },
+    {
+      "id": "reanime_01",
+      "name": "Re:ANIME",
+      "url": "https://reanime.to",
+      "category": "Tools",
+      "banner_image": "https://4kwallpapers.com/images/walls/thumbs_3t/22064.jpg",
+      "show_icon_overlay": false,
+      "description": "Watch free anime online in HD. Stream the latest seasonal hits, classic series, and everything in between — with no ads, no clutter, just anime.",
+      "No_login": true,
+      "accent_color": "#f2027f"
+    }
+  ]
+}
